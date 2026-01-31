@@ -1,10 +1,30 @@
 /**
   ******************************************************************************
   * @file    bsp_soft_i2c.c
-  * @author  
+  * @author  liqinghua <liqinghuaxx@163.com>
   * @version V1.0.0
   * @date    2026-01-29
   * @brief   软件I2C驱动模块
+  *
+  * @copyright (c) 2026 liqinghua
+  * 
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+  * in the Software without restriction, including without limitation the rights
+  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  * copies of the Software, and to permit persons to whom the Software is
+  * furnished to do so, subject to the following conditions:
+
+  * The above copyright notice and this permission notice shall be included in all
+  * copies or substantial portions of the Software.
+
+  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  * SOFTWARE.
   *
   * @details 
   *          本模块实现基于GPIO的软件I2C通信，支持多个I2C总线。
@@ -15,9 +35,7 @@
   *          - 多字节读写
   *
   * @warning 引脚初始化时必须使用开漏输出模式（GPIO_Mode_Out_OD）
-  *
-  ******************************************************************************
-  */
+  */  
 #include "bsp_soft_i2c.h"
 
 /****************** user port area start ****************/

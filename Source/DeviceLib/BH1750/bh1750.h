@@ -5,32 +5,38 @@
 
 #include <stdint.h>
 
-// I2C 地址（7位地址左移后的值，根据 ADDR 引脚电平）
-#define BH1750_ADDR_L   0x23  // ADDR 接 GND: 0100011 -> 左移后 0x46 & 0xFE = 0x46? 
-                              // 注意：你的 soft_i2c 库如果要求 8位地址（含 R/W），则：
-                              // 写地址 = 0x46 (0x23<<1), 读地址 = 0x47
-                              // 如果使用 7位地址由库内部左移，则保持 0x23
-                              // 这里假设你的库使用 8位地址格式（写地址）：
-#define BH1750_WRITE_ADDR_L  0x23   
-#define BH1750_WRITE_ADDR_H  0x5C  
+// I2C 地址（根据 ADDR 引脚电平）
+#define BH1750_ADDR_L   0x23  // ADDR 接 GND 时的地址
+#define BH1750_ADDR_H   0x5C  // ADDR 接 VCC 时的地址 
 
-// 命令定义（数据手册第5页）
-#define BH1750_POWER_DOWN     0x00
-#define BH1750_POWER_ON       0x01
-#define BH1750_RESET          0x07  // 仅复位数据寄存器，不是阈值
-#define BH1750_CONT_H_RES     0x10  // 连续 H 分辨率（1 lx）
-#define BH1750_CONT_H_RES2    0x11  // 连续 H 分辨率模式2（0.5 lx）
-#define BH1750_CONT_L_RES     0x13  // 连续 L 分辨率（4 lx，16ms）
-#define BH1750_ONE_TIME_H     0x20  // 单次 H 分辨率（测量后自动断电）
-#define BH1750_ONE_TIME_L     0x23  // 单次 L 分辨率
+// 基本控制命令
+#define BH1750_POWER_DOWN     0x00  // 关闭电源，进入低功耗模式（0.01uA）
+#define BH1750_POWER_ON       0x01  // 打开电源
+#define BH1750_RESET          0x07  // 仅复位数据寄存器，（清零测量结果，不影响 MTreg）
 
-// MTreg 命令前缀（数据手册第11页）
-#define BH1750_MT_H           0x40  // 01000_MT[7,6,5]
-#define BH1750_MT_L           0x60  // 011_MT[4,3,2,1,0]
+// 连续测量模式（测量完成后保持在该模式，不需要重复发送命令）
+#define BH1750_CONT_H_RES     0x10  // 连续高分辨率（分辨率: 1 lx，测量时间: ~120ms 标准 MTreg 值 69 时）
+#define BH1750_CONT_H_RES2    0x11  // 连续高分辨率模式2（分辨率: 0.5 lx，测量时间: ~120ms 标准 MTreg 值 69 时）
+#define BH1750_CONT_L_RES     0x13  // 连续低分辨率（分辨率: 4 lx，测量时间: ~16ms，功耗更低）
+
+// 单次测量模式（测量完成后自动进入 Power Down 状态，适合低功耗应用）
+#define BH1750_ONE_TIME_H     0x20  // 单次高分辨率模式（分辨率: 1 lx，测量时间: ~120ms）
+#define BH1750_ONE_TIME_H2    0x21  // 单次高分辨率模式2（分辨率: 0.5 lx，测量时间: ~120ms）
+#define BH1750_ONE_TIME_L     0x23  // 单次低分辨率模式（分辨率: 4 lx，测量时间: ~16ms）
+
+// MTreg 命令前缀（参考 BH1750 数据手册第 11 页）
+// 用于调节测量时间（积分时间），范围: 31~254，默认: 69
+// 调节时间会同步调节灵敏度
+#define BH1750_MT_H           0x40  // MTreg 高 3 位命令前缀（01000_MT[7:5]）
+#define BH1750_MT_L           0x60  // MTreg 低 5 位命令前缀（011_MT[4:0]）
 
 /* API */
-void bh1750_init(uint8_t addr);
-int  bh1750_read_lux(uint8_t addr, float *lux);
+uint8_t bh1750_init(uint8_t addr, uint8_t mode);
+int bh1750_read_lux(uint8_t addr, uint8_t mode, float *lux);
+int bh1750_read_lux_single(uint8_t addr,uint8_t mode, float *lux);
+uint8_t bh1750_set_mtreg(uint8_t addr, uint8_t mt_val);
+int bh1750_read_lux_ex(uint8_t addr, uint8_t mode, float *lux, uint8_t mtreg);
+int bh1750_read_lux_single_ex(uint8_t addr, uint8_t mode, float *lux, uint8_t mtreg);
 
 #endif
 
